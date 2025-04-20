@@ -1,9 +1,8 @@
-import { Schema, Types, model } from "mongoose";
-import { IOrder } from "./order.interface";
-import { Product } from "../product/product.model";
+import { Schema, model } from "mongoose";
 import { Coupon } from "../coupon/coupon.model";
-import AppError from "../../errors/appError";
-import { StatusCodes } from "http-status-codes";
+
+import { Product } from "../rental/rental.model";
+import { IOrder } from "./order.interface";
 
 const orderSchema = new Schema<IOrder>(
   {
@@ -12,11 +11,7 @@ const orderSchema = new Schema<IOrder>(
       ref: "User",
       required: true,
     },
-    shop: {
-      type: Schema.Types.ObjectId,
-      ref: "Shop",
-      required: true,
-    },
+
     products: [
       {
         product: {
@@ -68,10 +63,7 @@ const orderSchema = new Schema<IOrder>(
       enum: ["Pending", "Processing", "Completed", "Cancelled"],
       default: "Pending",
     },
-    shippingAddress: {
-      type: String,
-      required: true,
-    },
+
     paymentMethod: {
       type: String,
       enum: ["COD", "Online"],
@@ -95,23 +87,17 @@ orderSchema.pre("validate", async function (next) {
   // Step 1: Initialize total amount
   let totalAmount = 0;
   let finalDiscount = 0;
-  let shopId: Schema.Types.ObjectId | null = null;
 
   // Step 2: Calculate total amount for products
   for (let item of order.products) {
-    const product = await Product.findById(item.product).populate("shop");
+    const product = await Product.findById(item.product);
 
     if (!product) {
       return next(new Error(`Product not found!.`));
     }
-    if (shopId && String(shopId) !== String(product.shop._id)) {
-      return next(new Error("Products must be from the same shop."));
-    }
 
-    //@ts-ignore
-    shopId = product.shop._id;
-
-    const offerPrice = (await product?.calculateOfferPrice()) || 0;
+    // const offerPrice = (await product?.calculateOfferPrice()) || 0;
+    const offerPrice = 0;
 
     let productPrice = product.price;
     if (offerPrice) productPrice = Number(offerPrice);
@@ -124,9 +110,7 @@ orderSchema.pre("validate", async function (next) {
 
   if (order.coupon) {
     const couponDetails = await Coupon.findById(order.coupon);
-    if (String(shopId) === couponDetails?.shop.toString()) {
-      throw new AppError(StatusCodes.BAD_REQUEST, "The coupon is not applicable for your selected products")
-    }
+
     if (couponDetails && couponDetails.isActive) {
       if (totalAmount >= couponDetails.minOrderAmount) {
         if (couponDetails.discountType === "Percentage") {
@@ -143,15 +127,13 @@ orderSchema.pre("validate", async function (next) {
     }
   }
 
-  const isDhaka = order?.shippingAddress?.toLowerCase()?.includes("dhaka");
-  const deliveryCharge = isDhaka ? 60 : 120;
+  // const isDhaka = order?.shippingAddress?.toLowerCase()?.includes("dhaka");
+  // const deliveryCharge = isDhaka ? 60 : 120;
 
   order.totalAmount = totalAmount;
   order.discount = finalDiscount;
-  order.deliveryCharge = deliveryCharge;
-  order.finalAmount = totalAmount - finalDiscount + deliveryCharge;
-  //@ts-ignore
-  order.shop = shopId;
+  // order.deliveryCharge = deliveryCharge;
+  order.finalAmount = totalAmount - finalDiscount;
 
   next();
 });

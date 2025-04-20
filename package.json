@@ -1,5 +1,5 @@
 {
-  "name": "nextmart-server",
+  "name": "basafinder-server",
   "version": "1.0.0",
   "description": "A e-commerce web application server.",
   "main": "server.js",
@@ -25,11 +25,13 @@
     "handlebars": "^4.7.8",
     "http-status-codes": "^2.3.0",
     "jsonwebtoken": "^9.0.2",
+    "lucide-react": "^0.483.0",
     "mongoose": "^8.9.5",
     "multer": "^1.4.5-lts.1",
     "multer-storage-cloudinary": "^4.0.0",
     "nodemailer": "^6.9.16",
     "pdfkit": "^0.16.0",
+    "react": "^19.1.0",
     "sslcommerz-lts": "^1.1.0",
     "ua-parser-js": "^2.0.0",
     "zod": "^3.24.1"

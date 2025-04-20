@@ -1,10 +1,10 @@
 import { Request, Response } from "express";
-import catchAsync from "../../utils/catchAsync";
-import { ProductService } from "./product.service";
-import { IImageFiles } from "../../interface/IImageFile";
-import { IJwtPayload } from "../auth/auth.interface";
-import sendResponse from "../../utils/sendResponse";
 import { StatusCodes } from "http-status-codes";
+import { IImageFiles } from "../../interface/IImageFile";
+import catchAsync from "../../utils/catchAsync";
+import sendResponse from "../../utils/sendResponse";
+import { IJwtPayload } from "../auth/auth.interface";
+import { ProductService } from "./rental.service";
 
 const createProduct = catchAsync(async (req: Request, res: Response) => {
   const result = await ProductService.createProduct(

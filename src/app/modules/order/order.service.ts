@@ -1,19 +1,17 @@
+import { StatusCodes } from "http-status-codes";
 import mongoose, { Types } from "mongoose";
+import QueryBuilder from "../../builder/QueryBuilder";
+import AppError from "../../errors/appError";
 import { IJwtPayload } from "../auth/auth.interface";
 import { Coupon } from "../coupon/coupon.model";
-import { IOrder } from "./order.interface";
-import { Order } from "./order.model";
-import { Product } from "../product/product.model";
 import { Payment } from "../payment/payment.model";
 import { generateTransactionId } from "../payment/payment.utils";
-import { sslService } from "../sslcommerz/sslcommerz.service";
-import { generateOrderInvoicePDF } from "../../utils/generateOrderInvoicePDF";
-import { EmailHelper } from "../../utils/emailHelper";
-import User from "../user/user.model";
-import AppError from "../../errors/appError";
-import { StatusCodes } from "http-status-codes";
+import { Product } from "../rental/rental.model";
 import Shop from "../shop/shop.model";
-import QueryBuilder from "../../builder/QueryBuilder";
+import { sslService } from "../sslcommerz/sslcommerz.service";
+import User from "../user/user.model";
+import { IOrder } from "./order.interface";
+import { Order } from "./order.model";
 
 const createOrder = async (
   orderData: Partial<IOrder>,
@@ -26,7 +24,7 @@ const createOrder = async (
     if (orderData.products) {
       for (const productItem of orderData.products) {
         const product = await Product.findById(productItem.product)
-          .populate("shop")
+          // .populate("shop")
           .session(session);
 
         if (product) {
@@ -34,11 +32,11 @@ const createOrder = async (
             throw new Error(`Product ${product?.name} is inactive.`);
           }
 
-          if (product.stock < productItem.quantity) {
-            throw new Error(`Insufficient stock for product: ${product.name}`);
-          }
+          // if (product.stock < productItem.quantity) {
+          //   throw new Error(`Insufficient stock for product: ${product.name}`);
+          // }
           // Decrement the product stock
-          product.stock -= productItem.quantity;
+          // product.stock -= productItem.quantity;
           await product.save({ session });
         } else {
           throw new Error(`Product not found: ${productItem.product}`);
@@ -47,7 +45,7 @@ const createOrder = async (
     }
 
     // Handle coupon and update orderData
-    if (orderData.coupon) {
+    if (orderData?.coupon) {
       const coupon = await Coupon.findOne({ code: orderData.coupon }).session(
         session
       );
@@ -82,7 +80,7 @@ const createOrder = async (
 
     const payment = new Payment({
       user: authUser.userId,
-      shop: createdOrder.shop,
+      shop: "",
       order: createdOrder._id,
       method: orderData.paymentMethod,
       transactionId,
