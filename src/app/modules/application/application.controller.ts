@@ -27,6 +27,9 @@ const sendNumberToTenant = catchAsync(async (req: Request, res: Response) => {
 
 const getAllApplications = catchAsync(async (req, res) => {
   const result = await ApplicationServices.getAllApplications(req.query);
+  // const user = req?.user;
+
+  // const individualApplications = result?.result?.filter(application => application?.email ===  user?.email)
 
   sendResponse(res, {
     statusCode: StatusCodes.OK,

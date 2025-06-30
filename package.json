@@ -3,8 +3,8 @@
   "version": "1.0.0",
   "description": "A e-commerce web application server.",
   "main": "server.js",
-  "repository": "https://github.com/Programming-Hero-Next-Level-Development/NextMart-Server.git",
-  "author": "Next Level Web Development Team",
+  "repository": "https://github.com/Niloy11111/BasaFinder-Server",
+  "author": "Niloy",
   "license": "MIT",
   "scripts": {
     "start": "node dist/server.js",

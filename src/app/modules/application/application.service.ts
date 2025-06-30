@@ -77,6 +77,8 @@ const getAllApplications = async (query: Record<string, unknown>) => {
 
   const meta = await productQuery.countTotal();
 
+  // const individualApplications = products?.filter()
+
   return {
     meta,
     result: products,
