@@ -18,9 +18,9 @@ const reviewSchema = new Schema<IReview>(
       ref: "User",
       required: true,
     },
-    product: {
+    property: {
       type: Schema.Types.ObjectId,
-      ref: "Product",
+      ref: "Property",
       required: true,
     },
     isFlagged: {

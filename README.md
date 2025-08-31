@@ -1,4 +1,4 @@
-# BasaFinder Server
+# RentMode Server
 
 [![Node.js](https://img.shields.io/badge/Node.js-20+-green.svg)](https://nodejs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.7+-blue.svg)](https://www.typescriptlang.org/)
@@ -6,21 +6,23 @@
 [![MongoDB](https://img.shields.io/badge/MongoDB-8.9+-green.svg)](https://www.mongodb.com/)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-A robust and scalable backend solution for **BasaFinder**, a single-vendor e-commerce platform specializing in rental services. Built with modern technologies and best practices, this server provides comprehensive APIs for user management, product rentals, order processing, payment integration, and more.
+A robust and scalable backend solution for **RentMode**, a single-vendor e-commerce platform specializing in rental services. Built with modern technologies and best practices, this server provides comprehensive APIs for user management, property rentals, order processing, payment integration, and more.
 
 ## 🚀 Features
 
 ### Core Functionality
+
 - **🔐 User Authentication & Authorization**: JWT-based authentication with refresh tokens, OTP verification, and password reset
-- **🏠 Rental Product Management**: Complete CRUD operations for rental products with categories and specifications
+- **🏠 Rental Property Management**: Complete CRUD operations for rental properties with categories and specifications
 - **📦 Order Management**: Comprehensive order processing with status tracking and history
 - **💳 Payment Integration**: Secure payment processing with SSLCommerz integration
 - **🎫 Coupon System**: Dynamic coupon management with validation and discount calculations
-- **⭐ Review & Rating System**: User reviews and ratings for products
+- **⭐ Review & Rating System**: User reviews and ratings for properties
 - **📧 Email Notifications**: Automated email services for various user actions
 - **☁️ Cloud Storage**: Cloudinary integration for efficient image storage and retrieval
 
 ### Technical Features
+
 - **🛡️ Security**: Bcrypt password hashing, JWT tokens, CORS protection
 - **📊 Database**: MongoDB with Mongoose ODM for robust data management
 - **🔧 TypeScript**: Full TypeScript support with strict type checking
@@ -32,6 +34,7 @@ A robust and scalable backend solution for **BasaFinder**, a single-vendor e-com
 ## 🛠️ Tech Stack
 
 ### Backend Technologies
+
 - **Runtime**: Node.js 20+
 - **Framework**: Express.js 4.21+
 - **Language**: TypeScript 5.7+
@@ -45,12 +48,14 @@ A robust and scalable backend solution for **BasaFinder**, a single-vendor e-com
 - **PDF Generation**: PDFKit
 
 ### Development Tools
+
 - **Package Manager**: Yarn/NPM
 - **Development Server**: ts-node-dev
 - **Type Checking**: TypeScript compiler
 - **Environment**: dotenv for configuration
 
 ### Deployment & Infrastructure
+
 - **Containerization**: Docker
 - **Serverless**: Vercel deployment
 - **Environment**: Alpine Linux (Docker)
@@ -69,8 +74,8 @@ Before running this project, ensure you have the following installed:
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/Niloy11111/BasaFinder-Server.git
-cd BasaFinder-Server
+git clone https://github.com/Niloy11111/RentMode-Server.git
+cd RentMode-Server
 ```
 
 ### 2. Install Dependencies
@@ -144,13 +149,13 @@ Visit `http://localhost:3001` to see the welcome message and server details.
 
 ## 📚 Available Scripts
 
-| Command | Description |
-|---------|-------------|
-| `yarn dev` | Start development server with hot reload |
-| `yarn build` | Build the project for production |
-| `yarn start` | Start production server |
-| `yarn create-module` | Create a new module with boilerplate |
-| `yarn deploy` | Build and deploy to Vercel |
+| Command              | Description                              |
+| -------------------- | ---------------------------------------- |
+| `yarn dev`           | Start development server with hot reload |
+| `yarn build`         | Build the project for production         |
+| `yarn start`         | Start production server                  |
+| `yarn create-module` | Create a new module with boilerplate     |
+| `yarn deploy`        | Build and deploy to Vercel               |
 
 ## 🏗️ Project Structure
 
@@ -165,7 +170,7 @@ src/
 │   ├── modules/         # Feature modules
 │   │   ├── auth/        # Authentication module
 │   │   ├── user/        # User management
-│   │   ├── rental/      # Rental products
+│   │   ├── rental/      # Rental properties
 │   │   ├── order/       # Order management
 │   │   ├── payment/     # Payment processing
 │   │   ├── review/      # Reviews and ratings
@@ -185,17 +190,17 @@ src/
 
 ### Base URL: `http://localhost:3001/api/v1`
 
-| Module | Endpoints | Description |
-|--------|-----------|-------------|
-| **Auth** | `/auth/*` | Authentication, registration, password reset |
-| **Users** | `/user/*` | User profile management |
-| **Products** | `/product/*` | Rental product CRUD operations |
-| **Orders** | `/order/*` | Order management and tracking |
-| **Reviews** | `/review/*` | Product reviews and ratings |
-| **Coupons** | `/coupon/*` | Coupon management and validation |
-| **Payments** | `/ssl/*` | Payment processing and validation |
-| **Applications** | `/application/*` | Application management |
-| **Meta** | `/meta/*` | Metadata and configuration |
+| Module           | Endpoints        | Description                                  |
+| ---------------- | ---------------- | -------------------------------------------- |
+| **Auth**         | `/auth/*`        | Authentication, registration, password reset |
+| **Users**        | `/user/*`        | User profile management                      |
+| **Properties**   | `/property/*`    | Rental property CRUD operations              |
+| **Orders**       | `/order/*`       | Order management and tracking                |
+| **Reviews**      | `/review/*`      | Property reviews and ratings                 |
+| **Coupons**      | `/coupon/*`      | Coupon management and validation             |
+| **Payments**     | `/ssl/*`         | Payment processing and validation            |
+| **Applications** | `/application/*` | Application management                       |
+| **Meta**         | `/meta/*`        | Metadata and configuration                   |
 
 ### Example API Usage
 
@@ -212,8 +217,8 @@ curl -X POST http://localhost:3001/api/v1/auth/register \
     "password": "securepassword123"
   }'
 
-# Get products
-curl http://localhost:3001/api/v1/product
+# Get properties
+curl http://localhost:3001/api/v1/property
 ```
 
 ## 🐳 Docker Deployment
@@ -222,10 +227,10 @@ curl http://localhost:3001/api/v1/product
 
 ```bash
 # Build the Docker image
-docker build -t basafinder-server .
+docker build -t rentMode-server .
 
 # Run the container
-docker run -p 3001:3001 --env-file .env basafinder-server
+docker run -p 3001:3001 --env-file .env rentMode-server
 ```
 
 ### Docker Compose (Optional)
@@ -233,9 +238,9 @@ docker run -p 3001:3001 --env-file .env basafinder-server
 Create a `docker-compose.yml` file:
 
 ```yaml
-version: '3.8'
+version: "3.8"
 services:
-  basafinder-server:
+  rentMode-server:
     build: .
     ports:
       - "3001:3001"
@@ -245,7 +250,7 @@ services:
       - .env
     depends_on:
       - mongodb
-  
+
   mongodb:
     image: mongo:latest
     ports:
@@ -277,15 +282,15 @@ yarn deploy
 
 ### Environment Variables
 
-| Variable | Required | Description |
-|----------|----------|-------------|
-| `NODE_ENV` | Yes | Environment (development/production) |
-| `PORT` | Yes | Server port (default: 3001) |
-| `DB_URL` | Yes | MongoDB connection string |
-| `JWT_*` | Yes | JWT configuration secrets |
-| `CLOUDINARY_*` | Yes | Cloudinary credentials |
-| `SENDER_EMAIL` | Yes | Email sender configuration |
-| `SSL_*` | Yes | SSLCommerz payment configuration |
+| Variable       | Required | Description                          |
+| -------------- | -------- | ------------------------------------ |
+| `NODE_ENV`     | Yes      | Environment (development/production) |
+| `PORT`         | Yes      | Server port (default: 3001)          |
+| `DB_URL`       | Yes      | MongoDB connection string            |
+| `JWT_*`        | Yes      | JWT configuration secrets            |
+| `CLOUDINARY_*` | Yes      | Cloudinary credentials               |
+| `SENDER_EMAIL` | Yes      | Email sender configuration           |
+| `SSL_*`        | Yes      | SSLCommerz payment configuration     |
 
 ### Database Configuration
 
@@ -357,9 +362,9 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 For support and questions:
 
 - **Email**: fahimfiroz@gmail.com
-- **Issues**: [GitHub Issues](https://github.com/Niloy11111/BasaFinder-Server/issues)
+- **Issues**: [GitHub Issues](https://github.com/Niloy11111/RentMode-Server/issues)
 - **Documentation**: [API Documentation](https://documenter.getpostman.com/view/28371413/2sAYQXpCyd)
 
 ---
 
-**Made with ❤️ for the BasaFinder community**
+**Made with ❤️ for the RentMode community**

@@ -1,8 +1,8 @@
 import { Document, Types } from "mongoose";
 import { IPayment } from "../payment/payment.interface";
 
-export interface IOrderProduct {
-  product: Types.ObjectId;
+export interface IOrderProperty {
+  property: Types.ObjectId;
   quantity: number;
   unitPrice: number;
   color: string;
@@ -10,7 +10,7 @@ export interface IOrderProduct {
 
 export interface IOrder extends Document {
   user: Types.ObjectId;
-  products: IOrderProduct[];
+  properties: IOrderProperty[];
   coupon: Types.ObjectId | null;
   totalAmount: number;
   discount: number;

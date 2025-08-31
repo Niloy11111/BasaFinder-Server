@@ -162,7 +162,7 @@ const updateUserProfile = async (
       userId: user._id as string,
       name: payload.name as string,
       email: payload.email as string,
-      hasShop: user.hasShop,
+
       isActive: user.isActive,
       role: user.role,
     };

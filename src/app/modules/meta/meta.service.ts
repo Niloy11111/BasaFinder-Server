@@ -3,8 +3,7 @@ import AppError from "../../errors/appError";
 import { IJwtPayload } from "../auth/auth.interface";
 import { Order } from "../order/order.model";
 import { Payment } from "../payment/payment.model";
-import { Product } from "../rental/rental.model";
-import Shop from "../shop/shop.model";
+import { Property } from "../property/property.model";
 import User from "../user/user.model";
 
 const getMetaData = async (
@@ -15,10 +14,9 @@ const getMetaData = async (
 
   // For Admin-based meta data
   if (authUser.role === "admin") {
-    const totalShops = await Shop.countDocuments();
     const totalUsers = await User.countDocuments();
     const totalOrders = await Order.countDocuments();
-    const totalProducts = await Product.countDocuments();
+    const totalProperties = await Property.countDocuments();
 
     const totalRevenue = await Order.aggregate([
       { $group: { _id: null, totalRevenue: { $sum: "$totalAmount" } } },
@@ -32,42 +30,31 @@ const getMetaData = async (
     ]);
 
     // More statistics you can add for admin
-    const activeShops = await Shop.countDocuments({ isActive: true });
-    const inactiveShops = await Shop.countDocuments({ isActive: false });
 
     return {
-      totalShops,
       totalUsers,
       totalOrders,
-      totalProducts,
+      totalProperties,
       totalRevenue: totalRevenue[0]?.totalRevenue || 0,
       totalPayments,
       paymentStatusCounts,
-      activeShops,
-      inactiveShops,
     };
   }
 
-  // For User-based data (when the user has a shop)
   if (authUser.role === "user") {
-    const userShop = await Shop.findOne({ user: authUser.userId });
-
-    if (!userShop) {
-      throw new Error("User does not have a valid shop.");
-    }
-
     // Pie chart data
     const pieChartData = await Order.aggregate([
-      { $match: { shop: userShop._id } },
       {
-        $group: { _id: "$products.category", total: { $sum: "$totalAmount" } },
+        $group: {
+          _id: "$properties.category",
+          total: { $sum: "$totalAmount" },
+        },
       },
       { $project: { category: "$_id", totalAmount: 1, _id: 0 } },
     ]);
 
     // Bar chart data (total orders per month)
     const barChartData = await Order.aggregate([
-      { $match: { shop: userShop._id } },
       { $group: { _id: { $month: "$createdAt" }, totalOrders: { $sum: 1 } } },
       { $sort: { _id: 1 } },
       { $project: { month: "$_id", totalOrders: 1, _id: 0 } },
@@ -75,7 +62,6 @@ const getMetaData = async (
 
     // Line chart data (sales over time)
     const lineChartData = await Order.aggregate([
-      { $match: { shop: userShop._id } },
       {
         $group: {
           _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } },
@@ -88,7 +74,6 @@ const getMetaData = async (
 
     // Payment data (filter by start and end date)
     const paymentData = await Payment.aggregate([
-      { $match: { shop: userShop._id } },
       ...(startDate && endDate
         ? [
             {
@@ -105,19 +90,12 @@ const getMetaData = async (
       { $project: { status: "$_id", totalPayments: 1, _id: 0 } },
     ]);
 
-    // Order data (based on shop)
     const orderData = await Order.aggregate([
-      { $match: { shop: userShop._id } },
       { $group: { _id: "$status", totalOrders: { $sum: 1 } } },
       { $project: { status: "$_id", totalOrders: 1, _id: 0 } },
     ]);
 
-    // More statistics for user
-    const totalOrdersForUser = await Order.countDocuments({
-      shop: userShop._id,
-    });
     const totalRevenueForUser = await Order.aggregate([
-      { $match: { shop: userShop._id } },
       { $group: { _id: null, totalRevenue: { $sum: "$totalAmount" } } },
     ]);
 
@@ -129,7 +107,6 @@ const getMetaData = async (
     const todaysSales = await Order.aggregate([
       {
         $match: {
-          shop: userShop._id,
           createdAt: { $gte: startOfDay, $lte: endOfDay },
         },
       },
@@ -144,13 +121,12 @@ const getMetaData = async (
       lineChartData,
       paymentData,
       orderData,
-      totalOrdersForUser,
       totalRevenueForUser: totalRevenueForUser[0]?.totalRevenue || 0,
       todaysSalesAmount,
     };
   }
 
-  throw new Error("User does not have the required permissions or shop.");
+  throw new Error("User does not have the required permissions.");
 };
 
 export default getMetaData;

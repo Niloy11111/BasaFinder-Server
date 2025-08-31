@@ -3,7 +3,8 @@ import QueryBuilder from "../../builder/QueryBuilder";
 import AppError from "../../errors/appError";
 import { IPhoneNumber } from "../number/number.interface";
 import PhoneNumber from "../number/number.model";
-import { Product } from "../rental/rental.model";
+
+import { Property } from "../property/property.model";
 import User from "../user/user.model";
 import { IApplication } from "./application.interface";
 import Application from "./application.model";
@@ -30,7 +31,7 @@ const createApplication = async (
       "User information:Name is not correct!"
     );
   }
-  const property = await Product.findById(payload?.property);
+  const property = await Property.findById(payload?.property);
 
   if (!property) {
     throw new AppError(StatusCodes.NOT_FOUND, "This property is not found!");
@@ -61,7 +62,7 @@ const getAllApplications = async (query: Record<string, unknown>) => {
 
   // console.log("pquery", pQuery);
 
-  const productQuery = new QueryBuilder(Application.find(filter), pQuery)
+  const propertyQuery = new QueryBuilder(Application.find(filter), pQuery)
     .filter()
     .sort()
     .paginate()
@@ -69,19 +70,19 @@ const getAllApplications = async (query: Record<string, unknown>) => {
 
   // console.log("here", minSquareFeet, maxSquareFeet);
 
-  const products = await productQuery.modelQuery
+  const properties = await propertyQuery.modelQuery
     .populate("property")
     .populate("tenant")
     .populate({ path: "property", populate: { path: "landlord" } })
     .lean();
 
-  const meta = await productQuery.countTotal();
+  const meta = await propertyQuery.countTotal();
 
-  // const individualApplications = products?.filter()
+  // const individualApplications = properties?.filter()
 
   return {
     meta,
-    result: products,
+    result: properties,
   };
 };
 
@@ -89,11 +90,11 @@ const updateApplication = async (
   applicationId: string,
   payload: { status: string; landlordContactNumber?: string }
 ) => {
-  const product = await Application.findOne({
+  const property = await Application.findOne({
     _id: applicationId,
   });
 
-  if (!product) {
+  if (!property) {
     throw new AppError(StatusCodes.NOT_FOUND, "Application Not Found");
   }
   console.log("payload", payload);

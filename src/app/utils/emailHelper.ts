@@ -28,7 +28,7 @@ const sendEmail = async (
 
     // Email configuration
     const mailOptions: any = {
-      from: '"RentPoint" <support@rentpoint.com>',
+      from: '"RentMode" <support@rentMode.com>',
       to: email,
       subject,
       html,

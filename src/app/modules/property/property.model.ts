@@ -1,31 +1,31 @@
 import { Schema, model } from "mongoose";
 import { FlashSale } from "../flashSell/flashSale.model";
-import { getCoordinates } from "./rantal.utils";
-import { IProduct } from "./rental.interface";
+import { IProperty } from "./property.interface";
+import { getCoordinates } from "./property.utils";
 
-const rentalSchema = new Schema<IProduct>(
+const propertySchema = new Schema<IProperty>(
   {
     name: {
       type: String,
-      required: [true, "Product name is required"],
+      required: [true, "Property name is required"],
       unique: true,
       trim: true,
     },
     slug: {
       type: String,
-      required: [true, "Product slug is required"],
+      required: [true, "Property slug is required"],
       unique: true,
       trim: true,
     },
 
     description: {
       type: String,
-      required: [true, "Product description is required"],
+      required: [true, "Property description is required"],
       trim: true,
     },
     price: {
       type: Number,
-      required: [true, "Product price is required"],
+      required: [true, "Property price is required"],
       min: 0,
     },
     securityDeposit: {
@@ -55,7 +55,7 @@ const rentalSchema = new Schema<IProduct>(
     },
     imageUrls: {
       type: [String],
-      required: [true, "Product images are required"],
+      required: [true, "Property images are required"],
     },
     amenities: {
       type: String,
@@ -146,10 +146,10 @@ const rentalSchema = new Schema<IProduct>(
   }
 );
 
-rentalSchema.index({ "coordinates.coordinates": "2dsphere" });
+propertySchema.index({ "coordinates.coordinates": "2dsphere" });
 
 // Middleware to auto-generate the slug before saving
-rentalSchema.pre<IProduct>("validate", function (next) {
+propertySchema.pre<IProperty>("validate", function (next) {
   if (this.isModified("name") && !this.slug) {
     this.slug = this.name
       .toLowerCase()
@@ -159,8 +159,8 @@ rentalSchema.pre<IProduct>("validate", function (next) {
   next();
 });
 
-rentalSchema.methods.calculateOfferPrice = async function () {
-  const flashSale = await FlashSale.findOne({ product: this._id });
+propertySchema.methods.calculateOfferPrice = async function () {
+  const flashSale = await FlashSale.findOne({ property: this._id });
 
   if (flashSale) {
     const discount = (flashSale.discountPercentage / 100) * this.price;
@@ -170,7 +170,7 @@ rentalSchema.methods.calculateOfferPrice = async function () {
   return null; // or you can return 0 or another default value
 };
 
-rentalSchema.pre("save", async function (next) {
+propertySchema.pre("save", async function (next) {
   if (this.location.address) {
     const { lat, lng } = await getCoordinates(
       this.location.address,
@@ -192,4 +192,4 @@ rentalSchema.pre("save", async function (next) {
 
 // result();
 
-export const Product = model<IProduct>("Product", rentalSchema);
+export const Property = model<IProperty>("Property", propertySchema);

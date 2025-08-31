@@ -24,7 +24,7 @@ router.post(
 
 router.get(
   "/",
-  auth(UserRole.Landlord, UserRole.Tenant),
+  // auth(UserRole.Landlord, UserRole.Tenant),
   ApplicationController.getAllApplications
 );
 

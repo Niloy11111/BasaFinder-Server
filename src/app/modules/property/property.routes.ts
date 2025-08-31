@@ -4,22 +4,14 @@ import auth from "../../middleware/auth";
 import { parseBody } from "../../middleware/bodyParser";
 import validateRequest from "../../middleware/validateRequest";
 import { UserRole } from "../user/user.interface";
-import { ProductController } from "./rental.controller";
-import { rentalValidation } from "./rental.validation";
+import { PropertyController } from "./property.controller";
+import { rentalValidation } from "./property.validation";
 
 const router = Router();
 
-router.get("/", ProductController.getAllProduct);
+router.get("/", PropertyController.getAllProperties);
 
-router.get("/trending", ProductController.getTrendingProducts);
-
-router.get(
-  "/my-shop-products",
-  auth(UserRole.USER),
-  ProductController.getMyShopProducts
-);
-
-router.get("/:productId", ProductController.getSingleProduct);
+router.get("/:propertyId", PropertyController.getSingleProperty);
 
 // auth(UserRole.Landlord),
 router.post(
@@ -27,22 +19,22 @@ router.post(
   auth(UserRole.Landlord),
   multerUpload.fields([{ name: "images" }]),
   parseBody,
-  validateRequest(rentalValidation.createRentalValidationSchema),
-  ProductController.createProduct
+  validateRequest(rentalValidation.createPropertyValidationSchema),
+  PropertyController.createProperty
 );
 
 router.patch(
-  "/:productId",
+  "/:propertyId",
   auth(UserRole.Landlord, UserRole.ADMIN),
   multerUpload.fields([{ name: "images" }]),
   parseBody,
-  ProductController.updateProduct
+  PropertyController.updateProperty
 );
 
 router.delete(
-  "/:productId",
+  "/:propertyId",
   auth(UserRole.Landlord, UserRole.ADMIN),
-  ProductController.deleteProduct
+  PropertyController.deleteProperty
 );
 
-export const RentalRoutes = router;
+export const PropertyRoutes = router;

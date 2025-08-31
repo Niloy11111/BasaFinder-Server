@@ -13,7 +13,7 @@ export interface ILocation {
   coordinates: ICoordinates;
 }
 
-export interface IProduct extends Document {
+export interface IProperty extends Document {
   name: string;
   slug: string;
   description: string;

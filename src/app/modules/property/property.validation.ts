@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { PropertyTypeEnum } from "../../../lib/constants";
 
-const createRentalValidationSchema = z.object({
+const createPropertyValidationSchema = z.object({
   body: z.object({
     name: z.string().min(1, "Name is required"),
     description: z.string().min(1, "Description is required"),
@@ -27,7 +27,7 @@ const createRentalValidationSchema = z.object({
   }),
 });
 
-const updateRentalValidationSchema = z.object({
+const updatePropertyValidationSchema = z.object({
   body: z.object({
     name: z.string().min(1, "Rental name cannot be empty").optional(),
     // location: z.string().min(1, "Rental location cannot be empty").optional(),
@@ -42,6 +42,6 @@ const updateRentalValidationSchema = z.object({
 });
 
 export const rentalValidation = {
-  createRentalValidationSchema,
-  updateRentalValidationSchema,
+  createPropertyValidationSchema,
+  updatePropertyValidationSchema,
 };

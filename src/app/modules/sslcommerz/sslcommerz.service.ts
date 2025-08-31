@@ -31,9 +31,9 @@ const initPayment = async (paymentData: {
     cancel_url: config.ssl.cancel_url as string,
     ipn_url: "http://next-mart-steel.vercel.app/api/v1/ssl/ipn",
     shipping_method: "Courier",
-    product_name: "N/A.",
-    product_category: "N/A",
-    product_profile: "general",
+    property_name: "N/A.",
+    property_category: "N/A",
+    property_profile: "general",
     cus_name: "N/A",
     cus_email: "N/A",
     cus_add1: "Dhaka",
@@ -129,7 +129,7 @@ const validatePaymentService = async (tran_id: string): Promise<boolean> => {
         paymentStatus: data.status,
       },
       { new: true, session }
-    ).populate("user products.product");
+    ).populate("user properties.property");
 
     if (!updatedOrder) {
       throw new Error("Order not updated");

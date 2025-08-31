@@ -6,10 +6,8 @@ import { IJwtPayload } from "../auth/auth.interface";
 import { Coupon } from "../coupon/coupon.model";
 import { Payment } from "../payment/payment.model";
 import { generateTransactionId } from "../payment/payment.utils";
-import { Product } from "../rental/rental.model";
-import Shop from "../shop/shop.model";
+import { Property } from "../property/property.model";
 import { sslService } from "../sslcommerz/sslcommerz.service";
-import User from "../user/user.model";
 import { IOrder } from "./order.interface";
 import { Order } from "./order.model";
 
@@ -21,25 +19,25 @@ const createOrder = async (
   session.startTransaction();
 
   try {
-    if (orderData.products) {
-      for (const productItem of orderData.products) {
-        const product = await Product.findById(productItem.product)
-          // .populate("shop")
-          .session(session);
+    if (orderData.properties) {
+      for (const propertyItem of orderData.properties) {
+        const property = await Property.findById(propertyItem.property).session(
+          session
+        );
 
-        if (product) {
-          if (product.isActive === false) {
-            throw new Error(`Product ${product?.name} is inactive.`);
+        if (property) {
+          if (property.isActive === false) {
+            throw new Error(`property ${property?.name} is inactive.`);
           }
 
-          // if (product.stock < productItem.quantity) {
-          //   throw new Error(`Insufficient stock for product: ${product.name}`);
+          // if (property.stock < propertyItem.quantity) {
+          //   throw new Error(`Insufficient stock for property: ${property.name}`);
           // }
-          // Decrement the product stock
-          // product.stock -= productItem.quantity;
-          await product.save({ session });
+          // Decrement the property stock
+          // property.stock -= propertyItem.quantity;
+          await property.save({ session });
         } else {
-          throw new Error(`Product not found: ${productItem.product}`);
+          throw new Error(`property not found: ${propertyItem.property}`);
         }
       }
     }
@@ -74,13 +72,13 @@ const createOrder = async (
     });
 
     const createdOrder = await order.save({ session });
-    await createdOrder.populate("user products.product");
+    await createdOrder.populate("user properties.property");
 
     const transactionId = generateTransactionId();
 
     const payment = new Payment({
       user: authUser.userId,
-      shop: "",
+
       order: createdOrder._id,
       method: orderData.paymentMethod,
       transactionId,
@@ -135,54 +133,9 @@ const createOrder = async (
   }
 };
 
-const getMyShopOrders = async (
-  query: Record<string, unknown>,
-  authUser: IJwtPayload
-) => {
-  const userHasShop = await User.findById(authUser.userId).select(
-    "isActive hasShop"
-  );
-
-  if (!userHasShop)
-    throw new AppError(StatusCodes.NOT_FOUND, "User not found!");
-  if (!userHasShop.isActive)
-    throw new AppError(StatusCodes.BAD_REQUEST, "User account is not active!");
-  if (!userHasShop.hasShop)
-    throw new AppError(StatusCodes.BAD_REQUEST, "User does not have any shop!");
-
-  const shopIsActive = await Shop.findOne({
-    user: userHasShop._id,
-    isActive: true,
-  }).select("isActive");
-
-  if (!shopIsActive)
-    throw new AppError(StatusCodes.BAD_REQUEST, "Shop is not active!");
-
-  const orderQuery = new QueryBuilder(
-    Order.find({ shop: shopIsActive._id }).populate(
-      "user products.product coupon"
-    ),
-    query
-  )
-    .search(["user.name", "user.email", "products.product.name"])
-    .filter()
-    .sort()
-    .paginate()
-    .fields();
-
-  const result = await orderQuery.modelQuery;
-
-  const meta = await orderQuery.countTotal();
-
-  return {
-    meta,
-    result,
-  };
-};
-
 const getOrderDetails = async (orderId: string) => {
   const order = await Order.findById(orderId).populate(
-    "user products.product coupon"
+    "user properties.property coupon"
   );
   if (!order) {
     throw new AppError(StatusCodes.NOT_FOUND, "Order not Found");
@@ -198,11 +151,11 @@ const getMyOrders = async (
 ) => {
   const orderQuery = new QueryBuilder(
     Order.find({ user: authUser.userId }).populate(
-      "user products.product coupon"
+      "user properties.property coupon"
     ),
     query
   )
-    .search(["user.name", "user.email", "products.product.name"])
+    .search(["user.name", "user.email", "properties.property.name"])
     .filter()
     .sort()
     .paginate()
@@ -223,27 +176,8 @@ const changeOrderStatus = async (
   status: string,
   authUser: IJwtPayload
 ) => {
-  const userHasShop = await User.findById(authUser.userId).select(
-    "isActive hasShop"
-  );
-
-  if (!userHasShop)
-    throw new AppError(StatusCodes.NOT_FOUND, "User not found!");
-  if (!userHasShop.isActive)
-    throw new AppError(StatusCodes.BAD_REQUEST, "User account is not active!");
-  if (!userHasShop.hasShop)
-    throw new AppError(StatusCodes.BAD_REQUEST, "User does not have any shop!");
-
-  const shopIsActive = await Shop.findOne({
-    user: userHasShop._id,
-    isActive: true,
-  }).select("isActive");
-
-  if (!shopIsActive)
-    throw new AppError(StatusCodes.BAD_REQUEST, "Shop is not active!");
-
   const order = await Order.findOneAndUpdate(
-    { _id: new Types.ObjectId(orderId), shop: shopIsActive._id },
+    { _id: new Types.ObjectId(orderId) },
     { status },
     { new: true }
   );
@@ -252,7 +186,7 @@ const changeOrderStatus = async (
 
 export const OrderService = {
   createOrder,
-  getMyShopOrders,
+
   getOrderDetails,
   getMyOrders,
   changeOrderStatus,

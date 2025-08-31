@@ -3,7 +3,7 @@ import { JwtPayload } from "jsonwebtoken";
 import mongoose from "mongoose";
 import QueryBuilder from "../../builder/QueryBuilder";
 import AppError from "../../errors/appError";
-import { Product } from "../rental/rental.model";
+import { Property } from "../property/property.model";
 import { IReview } from "./review.interface";
 import { Review } from "./review.model";
 
@@ -17,7 +17,7 @@ const createReview = async (payload: IReview, user: JwtPayload) => {
     const existingReview = await Review.findOne(
       {
         user: user.userId,
-        product: payload.product,
+        property: payload.property,
       },
       null,
       { session }
@@ -26,7 +26,7 @@ const createReview = async (payload: IReview, user: JwtPayload) => {
     if (existingReview) {
       throw new AppError(
         StatusCodes.BAD_REQUEST,
-        "You have already reviewed this product."
+        "You have already reviewed this property."
       );
     }
 
@@ -34,11 +34,11 @@ const createReview = async (payload: IReview, user: JwtPayload) => {
       session,
     });
 
-    // Aggregate reviews for the product
+    // Aggregate reviews for the property
     const reviews = await Review.aggregate([
       {
         $match: {
-          product: review[0].product,
+          property: review[0].property,
         },
       },
       {
@@ -52,16 +52,16 @@ const createReview = async (payload: IReview, user: JwtPayload) => {
 
     const { averageRating = 0, ratingCount = 0 } = reviews[0] || {};
 
-    const updatedProduct = await Product.findByIdAndUpdate(
-      payload.product,
+    const updatedProperty = await Property.findByIdAndUpdate(
+      payload.property,
       { averageRating, ratingCount },
       { session, new: true }
     );
 
-    if (!updatedProduct) {
+    if (!updatedProperty) {
       throw new AppError(
         StatusCodes.NOT_FOUND,
-        "Product not found during rating update."
+        "Property not found during rating update."
       );
     }
 
@@ -77,7 +77,7 @@ const createReview = async (payload: IReview, user: JwtPayload) => {
 
 const getAllReviews = async (query: Record<string, unknown>) => {
   const brandQuery = new QueryBuilder(
-    Review.find().populate("product user"),
+    Review.find().populate("property user"),
     query
   )
     .search(["review"])

@@ -1,7 +1,7 @@
 import { Schema, model } from "mongoose";
-import { Coupon } from "../coupon/coupon.model";
 
-import { Product } from "../rental/rental.model";
+import { Coupon } from "../coupon/coupon.model";
+import { Property } from "../property/property.model";
 import { IOrder } from "./order.interface";
 
 const orderSchema = new Schema<IOrder>(
@@ -12,11 +12,11 @@ const orderSchema = new Schema<IOrder>(
       required: true,
     },
 
-    products: [
+    properties: [
       {
-        product: {
+        property: {
           type: Schema.Types.ObjectId,
-          ref: "Product",
+          ref: "Property",
           required: true,
         },
         quantity: {
@@ -88,22 +88,22 @@ orderSchema.pre("validate", async function (next) {
   let totalAmount = 0;
   let finalDiscount = 0;
 
-  // Step 2: Calculate total amount for products
-  for (let item of order.products) {
-    const product = await Product.findById(item.product);
+  // Step 2: Calculate total amount for propertys
+  for (let item of order.properties) {
+    const property = await Property.findById(item.property);
 
-    if (!product) {
-      return next(new Error(`Product not found!.`));
+    if (!property) {
+      return next(new Error(`Property not found!.`));
     }
 
-    // const offerPrice = (await product?.calculateOfferPrice()) || 0;
+    // const offerPrice = (await property?.calculateOfferPrice()) || 0;
     const offerPrice = 0;
 
-    let productPrice = product.price;
-    if (offerPrice) productPrice = Number(offerPrice);
+    let propertyPrice = property.price;
+    if (offerPrice) propertyPrice = Number(offerPrice);
 
-    item.unitPrice = productPrice;
-    const price = productPrice * item.quantity;
+    item.unitPrice = propertyPrice;
+    const price = propertyPrice * item.quantity;
     console.log(price);
     totalAmount += price;
   }

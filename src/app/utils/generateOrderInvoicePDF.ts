@@ -72,24 +72,22 @@ export const generateOrderInvoicePDF = async (
       doc.moveDown(1);
       // doc.lineWidth(0.5).moveTo(50, doc.y).lineTo(550, doc.y).stroke();  // Horizontal line
 
-      // // Order Products in a table format
       // doc.moveDown(2);
       doc
         .fontSize(11)
         .font("Helvetica-Bold")
         .fillColor("#003366")
-        .text("Order Products:", { underline: true });
+        .text("Order Property:", { underline: true });
       doc.moveDown(1);
 
       const tableTop = doc.y;
       const tableHeight = 20;
 
-      // Table Headers for Products (Bold and Colored)
       doc
         .fontSize(11)
         .font("Helvetica-Bold")
         .fillColor("#003366")
-        .text("Product Name", 50, tableTop);
+        .text("Property Name", 50, tableTop);
       doc.text("Quantity", 300, tableTop);
       doc.text("Price", 450, tableTop);
 
@@ -100,10 +98,10 @@ export const generateOrderInvoicePDF = async (
         .stroke(); // Table header line
       let currentY = tableTop + tableHeight + 5;
 
-      // Order Products (Normal text, not bold)
-      order.products.forEach((item) => {
+      // Order properties (Normal text, not bold)
+      order.properties.forEach((item) => {
         //@ts-ignore
-        const productName = item.product?.name || "Unknown Product";
+        const propertyName = item.property?.name || "Unknown Property";
         const quantity = item.quantity;
         //@ts-ignore
         const price = item.unitPrice * quantity || 0;
@@ -111,7 +109,7 @@ export const generateOrderInvoicePDF = async (
         doc
           .fontSize(11)
           .fillColor("#000000")
-          .text(productName, 50, currentY, { width: 130, align: "left" });
+          .text(propertyName, 50, currentY, { width: 130, align: "left" });
         doc.text(quantity.toString(), 280, currentY, {
           width: 90,
           align: "center",
@@ -196,7 +194,7 @@ export const generateOrderInvoicePDF = async (
       doc.lineWidth(0.5).moveTo(50, pricingY).lineTo(550, pricingY).stroke();
 
       doc.moveDown(3);
-      doc.fontSize(9).text("Thank you for shopping!");
+      doc.fontSize(9).text("Thank you for rent!");
       doc
         .fontSize(9)
         .fillColor("#003366")

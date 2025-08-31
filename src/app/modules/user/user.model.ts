@@ -37,10 +37,7 @@ const userSchema = new Schema<IUser, UserModel>(
       enum: [UserRole.ADMIN, UserRole.USER, UserRole.Landlord, UserRole.Tenant],
       required: true,
     },
-    hasShop: {
-      type: Boolean,
-      default: false, // Default value is false
-    },
+
     clientInfo: {
       device: {
         type: String,

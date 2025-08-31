@@ -1,12 +1,12 @@
 import { Types } from "mongoose";
 
 export interface IFlashSale {
-  product: Types.ObjectId;
+  property: Types.ObjectId;
   discountPercentage: number;
-  createdBy?: Types.ObjectId
+  createdBy?: Types.ObjectId;
 }
 
 export interface ICreateFlashSaleInput {
-  products: string[];
+  properties: string[];
   discountPercentage: number;
 }

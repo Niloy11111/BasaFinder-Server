@@ -1,9 +1,5 @@
-import { StatusCodes } from "http-status-codes";
 import QueryBuilder from "../../builder/QueryBuilder";
-import AppError from "../../errors/appError";
 import { IJwtPayload } from "../auth/auth.interface";
-import Shop from "../shop/shop.model";
-import User from "../user/user.model";
 import { ICreateFlashSaleInput } from "./flashSale.interface";
 import { FlashSale } from "./flashSale.model";
 
@@ -11,34 +7,15 @@ const createFlashSale = async (
   flashSellData: ICreateFlashSaleInput,
   authUser: IJwtPayload
 ) => {
-  const userHasShop = await User.findById(authUser.userId).select(
-    "isActive hasShop"
-  );
-
-  if (!userHasShop)
-    throw new AppError(StatusCodes.NOT_FOUND, "User not found!");
-  if (!userHasShop.isActive)
-    throw new AppError(StatusCodes.BAD_REQUEST, "User account is not active!");
-  if (!userHasShop.hasShop)
-    throw new AppError(StatusCodes.BAD_REQUEST, "User does not have any shop!");
-
-  const shopIsActive = await Shop.findOne({
-    user: userHasShop._id,
-    isActive: true,
-  }).select("isActive");
-
-  if (!shopIsActive)
-    throw new AppError(StatusCodes.BAD_REQUEST, "Shop is not active!");
-
-  const { products, discountPercentage } = flashSellData;
+  const { properties, discountPercentage } = flashSellData;
   const createdBy = authUser.userId;
 
-  const operations = products.map((product) => ({
+  const operations = properties.map((property) => ({
     updateOne: {
-      filter: { product },
+      filter: { property },
       update: {
         $setOnInsert: {
-          product,
+          property,
           discountPercentage,
           createdBy,
         },
@@ -55,11 +32,7 @@ const getActiveFlashSalesService = async (query: Record<string, unknown>) => {
   const { minPrice, maxPrice, ...pQuery } = query;
 
   const flashSaleQuery = new QueryBuilder(
-    FlashSale.find()
-      .populate("product")
-      .populate("product.category", "name")
-      .populate("product.shop", "shopName")
-      .populate("product.brand", "name"),
+    FlashSale.find().populate("property").populate("property.category", "name"),
     query
   ).paginate();
 
@@ -67,30 +40,30 @@ const getActiveFlashSalesService = async (query: Record<string, unknown>) => {
 
   const flashSaleMap = flashSales.reduce((acc, flashSale) => {
     //@ts-ignore
-    acc[flashSale.product._id.toString()] = flashSale.discountPercentage;
+    acc[flashSale.property._id.toString()] = flashSale.discountPercentage;
     return acc;
   }, {});
 
-  const productsWithOfferPrice = flashSales.map((flashSale: any) => {
-    const product = flashSale.product;
+  const propertiesWithOfferPrice = flashSales.map((flashSale: any) => {
+    const property = flashSale.property;
     //@ts-ignore
-    const discountPercentage = flashSaleMap[product._id.toString()];
+    const discountPercentage = flashSaleMap[property._id.toString()];
 
     if (discountPercentage) {
-      const discount = (discountPercentage / 100) * product.price;
-      product.offerPrice = product.price - discount;
+      const discount = (discountPercentage / 100) * property.price;
+      property.offerPrice = property.price - discount;
     } else {
-      product.offerPrice = null;
+      property.offerPrice = null;
     }
 
-    return product;
+    return property;
   });
 
   const meta = await flashSaleQuery.countTotal();
 
   return {
     meta,
-    result: productsWithOfferPrice,
+    result: propertiesWithOfferPrice,
   };
 };
 

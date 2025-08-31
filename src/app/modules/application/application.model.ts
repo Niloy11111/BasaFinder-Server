@@ -37,7 +37,7 @@ const ApplicationSchema = new Schema<IApplication>(
     },
     property: {
       type: Schema.Types.ObjectId,
-      ref: "Product",
+      ref: "Property",
       required: [true, "Property id is required"],
     },
     status: {

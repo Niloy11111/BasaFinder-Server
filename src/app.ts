@@ -34,7 +34,7 @@ app.get("/", (req: Request, res: Response, next: NextFunction) => {
 
   res.status(StatusCodes.OK).json({
     success: true,
-    message: "Welcome to the RentPoint",
+    message: "Welcome to the RentMode",
     version: "1.0.0",
     clientDetails: {
       ipAddress: clientIp,
@@ -48,8 +48,8 @@ app.get("/", (req: Request, res: Response, next: NextFunction) => {
       )} minutes`,
     },
     developerContact: {
-      email: "fahimfiroz@gmail.com",
-      website: "https://rentPoint.com",
+      email: "ektiaruddinniloy859@gmail.com",
+      website: "https://rentMode.com",
     },
   });
 });
